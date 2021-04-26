@@ -1,0 +1,165 @@
+import React from 'react';
+import { Modal, Button, Form, Divider } from 'semantic-ui-react';
+
+// modal for editing personal info on talent profile
+
+// props.data={}	// the data prop passed in to TalentAboutSegment, containing talent personal info
+function TalentPersonalModal(props) {
+	const [isOpen, setOpen] = React.useState(false);
+	const [returnData] = React.useState({});
+
+	return (
+		<Modal
+			trigger={
+				<Button circular icon="pencil" color="blue" floated="right" />
+			}
+			//Control whether modal is open with state hook
+			open={isOpen}
+			onOpen={() => setOpen(true)}
+			onClose={() => setOpen(false)}
+			closeOnDimmerClick={false}
+		>
+			<Modal.Header>Edit Personal Information</Modal.Header>
+			<Modal.Content>
+				<Form>
+					<Form.Group widths="equal">
+						<Form.Input
+							label="First Name"
+							defaultValue={props.data.firstName}
+							onChange={(e, { value }) => (returnData.firstName = value)}
+						/>
+						<Form.Input
+							label="Last Name"
+							defaultValue={props.data.lastName}
+							onChange={(e, { value }) => (returnData.lastName = value)}
+						/>
+					</Form.Group>
+					<Form.Group>
+						<Form.Dropdown
+							width="16"
+							label="Roles:"
+							options={roles}
+							fluid
+							multiple
+							selection
+							defaultValue={props.data.roles}
+							onChange={(e, { value }) => (returnData.roles = value)}
+						/>
+					</Form.Group>
+					<Form.Group widths="equal">
+						<Form.Input
+							label="Country"
+							disabled
+							defaultValue="United States"
+						/>
+						<Form.Dropdown
+							selection
+							label="State"
+							options={states}
+							defaultValue={props.data.state}
+							onChange={(e, { value }) => (returnData.state = value)}
+						/>
+						<Form.Input
+							label="City"
+							defaultValue={props.data.city}
+							onChange={(e, { value }) => (returnData.city = value)}
+						/>
+					</Form.Group>
+					<Form.Group>
+						<Form.Dropdown
+							selection
+							label="Maximum Driving Range"
+							defaultValue={props.data.range}
+							options={ranges}
+							onChange={(e, { value }) => (returnData.range = value)}
+						/>
+					</Form.Group>
+					<br />
+					<Divider />
+					<Form.Group widths="equal">
+						<Form.Input
+							label="Email"
+							defaultValue={props.data.email}
+							onChange={(e, { value }) => (returnData.email = value)}
+						/>
+						<Form.Input
+							label="Phone"
+							defaultValue={props.data.phone}
+							onChange={(e, { value }) => (returnData.phone = value)}
+						/>
+					</Form.Group>
+				</Form>
+				<br />
+				<Button
+					color="blue"
+					onClick={() => {
+						sendData(returnData);
+						setOpen(false);
+					}}
+				>
+					Submit
+				</Button>
+				<Button onClick={() => setOpen(false)}>Cancel</Button>
+			</Modal.Content>
+		</Modal>
+	);
+}
+
+// Send data back to db
+// %%%%%%%%%%%%%%%% TODO: db
+function sendData(data) {
+	console.log(data);
+}
+
+//Dropdown will break if the key/value does not match the data being stored in the db
+const roles = [
+	{
+		key: 'Bartender',
+		text: 'Bartender',
+		value: 'Bartender',
+	},
+	{
+		key: 'Bhotographer',
+		text: 'Photographer',
+		value: 'Photographer',
+	},
+	{
+		key: 'Mixologist',
+		text: 'Mixologist',
+		value: 'Mixologist',
+	},
+	{
+		key: 'PromoModel',
+		text: 'Promotional Model',
+		value: 'PromoModel',
+	},
+	//ADD MORE
+];
+
+const states = [
+	{
+		key: 'California',
+		text: 'California',
+		value: 'California',
+	},
+];
+
+const ranges = [
+	{
+		key: 10,
+		text: '10 miles',
+		value: 10,
+	},
+	{
+		key: 25,
+		text: '25 miles',
+		value: 25,
+	},
+	{
+		key: 50,
+		text: '50+ miles',
+		value: 50,
+	},
+];
+
+export default TalentPersonalModal;

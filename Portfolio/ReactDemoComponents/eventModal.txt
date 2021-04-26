@@ -1,0 +1,236 @@
+import React from 'react';
+import {
+	Modal,
+	Grid,
+	Header,
+	List,
+	Icon,
+	Image,
+	Menu,
+	Divider,
+	Container,
+	Button,
+} from 'semantic-ui-react';
+
+// Represents the modal popup for displaying UPCOMING event information, namely the upcoming events on the talent dashboard
+// For past or settle events, see EventModalComplete
+
+// props:
+// data={}  //holds all the event info from the database
+// trigger={<Button> or something </Button>}    //the trigger for the popup, makes this component more flexible
+// on talent dashboard the trigger is the label underneath the card, used in SingleUpcomingEventCard
+
+function EventModal(props) {
+	// state for whether modal is open
+	const [isOpen, setOpen] = React.useState(false);
+	// state for what content is currently being displayed on the bottom of the modal
+	// 'about' | 'parking' | 'uniform'
+	const [content, setContent] = React.useState('about');
+
+	const ICON_BUFFER = 1;
+	const ICON_WIDTH = 1;
+
+	return (
+		<Modal
+			trigger={props.trigger}
+			open={isOpen}
+			onOpen={() => setOpen(true)}
+			onClose={() => setOpen(false)}
+			closeIcon
+		>
+			<Modal.Header>{props.data.name}</Modal.Header>
+			<Modal.Content>
+				<Grid>
+					<Grid.Row>
+						<Grid.Column>
+							<Header sub>Role</Header>
+							{props.data.role}
+						</Grid.Column>
+					</Grid.Row>
+
+					<Grid.Row columns="2">
+						{/* ADDRESS */}
+						<Grid.Column>
+							<Header sub>Address</Header>
+							<List>
+								<List.Item>{props.data.addressName}</List.Item>
+								<List.Item>{props.data.address1}</List.Item>
+								{ifExists(props.data.address2)}
+								<List.Item>
+									{props.data.address2}
+									{`${props.data.addressCity}, ${props.data.addressState} ${props.data.addressZip}`}
+								</List.Item>
+							</List>
+						</Grid.Column>
+						{/* TYPE / ATTENDEES */}
+						<Grid.Column>
+							<Header sub>Type</Header>
+							{props.data.type}
+							<Header sub>Estimated Attendees</Header>
+							{props.data.estAttend}
+						</Grid.Column>
+					</Grid.Row>
+
+					<Grid.Row>
+						{/* DATE / TIME  */}
+						<Grid.Column width={ICON_BUFFER} />
+						<Grid.Column textAlign="center" width={ICON_WIDTH}>
+							<Icon name="calendar outline" size="big" />
+						</Grid.Column>
+						<Grid.Column width={16 - ICON_WIDTH - ICON_BUFFER}>
+							<List>
+								<List.Item>
+									{`${props.data.month} ${props.data.day}, ${props.data.year}`}
+								</List.Item>
+								<List.Item>
+									{`${props.data.startTime} - ${props.data.endTime}`}
+								</List.Item>
+							</List>
+						</Grid.Column>
+					</Grid.Row>
+					{/* DOLLAR RATE  */}
+					<Grid.Row>
+						<Grid.Column width={ICON_BUFFER} />
+						<Grid.Column textAlign="center" width={ICON_WIDTH}>
+							<Icon name="dollar sign" size="big" />
+						</Grid.Column>
+						<Grid.Column width={16 - ICON_WIDTH - ICON_BUFFER}>
+							{`$${props.data.rate} per hour`}
+						</Grid.Column>
+					</Grid.Row>
+					{/* EVENT MANAGER  */}
+					<Grid.Row>
+						<Grid.Column width={ICON_BUFFER} />
+						<Grid.Column textAlign="center" width={ICON_WIDTH}>
+							<Image
+								src={getEventManagerPicture()}
+								size="small"
+								circular
+							/>
+						</Grid.Column>
+						<Grid.Column width={16 - ICON_WIDTH - ICON_BUFFER}>
+							{`$${props.data.rate} per hour`}
+						</Grid.Column>
+					</Grid.Row>
+				</Grid>
+				{/* SUBMENU  **********/}
+				<Divider />
+				<Menu pointing secondary>
+					<Menu.Item
+						name="about"
+						active={content === 'about'}
+						onClick={() => setContent('about')}
+					/>
+					<Menu.Item
+						name="parking"
+						active={content === 'parking'}
+						onClick={() => setContent('parking')}
+					/>
+					<Menu.Item
+						name="uniform"
+						active={content === 'uniform'}
+						onClick={() => setContent('uniform')}
+					/>
+				</Menu>
+				{getContent(content, props.data)}
+				<Divider />
+				{getStatusContent(props.data.status, setOpen)}
+			</Modal.Content>
+		</Modal>
+	);
+}
+
+// Display the list item, only if it exists. Used mostly for address2
+const ifExists = (data) => {
+	if (data !== '') return <List.Item>{data}</List.Item>;
+};
+
+// get the picture of the event manager from the database
+// %%%%%%%%%%%%%%% FIXME - implement database function
+function getEventManagerPicture() {
+	return 'eventGuy.jpg';
+}
+
+// Return content under menu depending on state, passed in as 'content'
+function getContent(content, data) {
+	if (content === 'about') {
+		// ABOUT
+		return (
+			<Container>
+				<Header sub>About this Event</Header>
+				{data.about}
+			</Container>
+		);
+	} else if (content === 'parking') {
+		// PARKING
+		return (
+			<Container>
+				<Grid>
+					<Grid.Row columns="2">
+						<Grid.Column>
+							<Header sub>Parking</Header>
+							{data.parkingType}
+							<Header sub>Parking Address</Header>
+							<List>
+								{ifExists(data.parkingAddressName)}
+								<List.Item>{data.parkingAddress1}</List.Item>
+								{ifExists(data.parkingAddress2)}
+								<List.Item>
+									{`${data.parkingCity}, ${data.parkingState} ${data.parkingZip}`}
+								</List.Item>
+							</List>
+						</Grid.Column>
+						<Grid.Column>
+							<Header sub>Instruction</Header>
+							{data.parkingInstructions}
+						</Grid.Column>
+					</Grid.Row>
+				</Grid>
+			</Container>
+		);
+	} else if (content === 'uniform') {
+		// UNIFORM
+		return (
+			<Container>
+				<Header sub>General Uniform Details</Header>
+				{data.generalUniform}
+				<Header sub>{`${data.role} Uniform`}</Header>
+				{data.specialUniform}
+			</Container>
+		);
+	}
+}
+
+// Display buttons based on status
+// pass in setOpen to access state
+function getStatusContent(status, setOpen) {
+	if (status === 'request') {
+		return (
+			<Grid>
+				<Grid.Row columns="2">
+					<Grid.Column textAlign="right">
+						<Button
+							content="Accept"
+							size="big"
+							positive
+							onClick={() => {
+								setOpen(false);
+							}}
+						/>
+					</Grid.Column>
+					<Grid.Column textAlign="left" verticalAlign="middle">
+						<Button
+							content="I'll Pass"
+							size="small"
+							onClick={() => {
+								setOpen(false);
+							}}
+						/>
+					</Grid.Column>
+				</Grid.Row>
+			</Grid>
+		);
+	}
+}
+
+export default EventModal;

@@ -1,0 +1,89 @@
+import React from 'react';
+import { Segment, Image, Grid, Button, Header, Label } from 'semantic-ui-react';
+import TalentPersonalModal from './modals/talentPersonalModal';
+
+// Represents the first section of the talent profile page, with the personal information
+
+// 2 Props:
+// photo = "./photo.png" //the source link to the photo
+// data = {firstName, lastName, roles = [], email, phone, location, range, height, shirtSize, pantsSize, dressSize, languages = [], educationLevel }
+
+function TalentPersonalSegment(props) {
+	const PHOTO_COLUMN_SIZE = 4;
+
+	return (
+		<Segment>
+			{/* Modals look like the edit button, and are floated to the right */}
+			<TalentPersonalModal data={props.data} />
+			<Grid relaxed>
+				<Grid.Column width={PHOTO_COLUMN_SIZE}>
+					<Image centered src={props.photo} fluid />
+					<br />
+					<Button>+ Add Profile Picture</Button>
+				</Grid.Column>
+
+				<Grid.Column textAlign="left" width={16 - PHOTO_COLUMN_SIZE}>
+					<Grid.Row>
+						<Header size="large" textAlign="left">
+							<Header.Content>
+								{props.data.firstName + ' ' + props.data.lastName}
+								<Header.Subheader>
+									{props.data.roles.join(' | ')}
+								</Header.Subheader>
+							</Header.Content>
+						</Header>
+					</Grid.Row>
+					<br />
+					<Grid.Row>
+						<Label size="large">{props.data.email}</Label>
+						<Label size="large">{props.data.phone}</Label>
+					</Grid.Row>
+
+					<Grid.Row>
+						{/* Inner Grid for Sizes etc. */}
+						<br />
+						<Grid fluid divided columns="4">
+							<Grid.Row>
+								<Grid.Column>
+									<Header sub>Location</Header>
+									{props.data.location}
+									<br />
+									<Header sub>Range</Header>
+									{props.data.range + ' miles'}
+									<br />
+								</Grid.Column>
+								<Grid.Column>
+									<Header sub>Height</Header>
+									{props.data.height}
+									<br />
+									<Header sub>Shirt Size</Header>
+									{props.data.shirtSize}
+									<br />
+								</Grid.Column>
+								<Grid.Column>
+									<Header sub>Pants Size</Header>
+									{props.data.pantsSize}
+									<br />
+									<Header sub>Dress Size</Header>
+									{props.data.dressSize}
+									<br />
+								</Grid.Column>
+								<Grid.Column>
+									<Header sub>Languages</Header>
+									{props.data.languages.join(', ')}
+									<br />
+									<Header sub>Education Level</Header>
+									{props.data.education}
+									<br />
+								</Grid.Column>
+							</Grid.Row>
+						</Grid>
+						{/* End Inner Grid */}
+					</Grid.Row>
+				</Grid.Column>
+			</Grid>
+		</Segment>
+	);
+}
+
+export default TalentPersonalSegment;
